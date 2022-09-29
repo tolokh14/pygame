@@ -15,9 +15,11 @@ pg.display.set_icon(icon)
 playerImg = pg.image.load('assets/player.png')
 playerX = 370
 playerY = 480
+playerX_change = 0
+playerY_change = 0
 
-def player():
-    screen.blit(playerImg, (playerX, playerY))
+def player(x,y):
+    screen.blit(playerImg, (x, y))
 
 #game loop
 running = True
@@ -32,5 +34,34 @@ while running:
             if event.key == pg.K_ESCAPE:
                 running = False
 
-    player()
+        #check keyboard press
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_LEFT:
+                playerX_change = -0.3
+            if event.key == pg.K_RIGHT:
+                playerX_change = 0.3
+            if event.key == pg.K_UP:
+                playerY_change = -0.3
+            if event.key == pg.K_DOWN:
+                playerY_change = 0.3
+        if event.type == pg.KEYUP:
+            if event.key == pg.K_LEFT or event.key == pg.K_RIGHT:
+                playerX_change = 0
+            if event.key == pg.K_UP or event.key == pg.K_DOWN:
+                playerY_change = 0
+
+    playerX += playerX_change
+    playerY += playerY_change
+
+    if playerX <= 0:
+        playerX = 0
+    elif playerX >= 736:
+        playerX = 736
+
+    if playerY <= 0:
+        playerY = 0
+    elif playerY >= 536:
+        playerY = 536
+
+    player(playerX,playerY)
     pg.display.update()
