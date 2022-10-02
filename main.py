@@ -1,5 +1,6 @@
 import pygame as pg
 import random as ran
+import math 
 
 # initialize the pygames
 pg.init()
@@ -24,7 +25,7 @@ playerY_change = 0
 
 # enemy
 enemyImg = pg.image.load('assets/alien.png')
-enemyX = ran.randint(0, 736)
+enemyX = ran.randint(0, 735)
 enemyY = 40
 enemyX_change = 4
 enemyY_change = 40
@@ -37,6 +38,7 @@ bulletX_change = 0
 bulletY_change = 10
 bullet_state = "ready"
 
+score = 0
 
 def player(x, y):
     screen.blit(playerImg, (x, y))
@@ -51,6 +53,12 @@ def fire_bullet(x, y):
     bullet_state = "fire"
     screen.blit(bulletImg, (x + 16, y + 10))
 
+def isCollision (enemyX,enemyY,bulletX,bulletY):
+    distance = math.sqrt((math.pow(enemyX-bulletX,2)) + (math.pow(enemyY-bulletY,2)))
+    if distance < 27:
+        return True
+    else:
+        return False
 
 # game loop
 running = True
@@ -78,7 +86,9 @@ while running:
             if event.key == pg.K_DOWN:
                 playerY_change = 5
             if event.key == pg.K_SPACE:
-                fire_bullet(playerX,bulletY)
+                if bullet_state == "ready":
+                    bulletX = playerX
+                    fire_bullet(bulletX,bulletY)
 
         if event.type == pg.KEYUP:
             if event.key == pg.K_LEFT or event.key == pg.K_RIGHT:
@@ -110,9 +120,22 @@ while running:
         enemyY += enemyY_change
     
     #bullet movement
-    if bullet_state is "fire":
-        fire_bullet(playerX,bulletY)
+    if bulletY <= 0:
+        bulletY = 480
+        bullet_state = "ready"
+    if bullet_state == "fire":
+        fire_bullet(bulletX,bulletY)
         bulletY -= bulletY_change
+
+    #collision
+    collision = isCollision(enemyX,enemyY,bulletX,bulletY)
+    if collision:
+        bulletY = 480
+        bullet_state = "ready"
+        score += 1
+        print(score)
+        enemyX = ran.randint(0, 735)
+        enemyY = 40
 
     player(playerX, playerY)
     enemy(enemyX, enemyY)
