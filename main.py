@@ -40,7 +40,7 @@ for i in range (num_of_enemies):
     enemyImg.append(pg.image.load('assets/alien.png'))
     enemyX.append(ran.randint(0, 735))
     enemyY.append(ran.randint(0,40))
-    enemyX_change.append(4)
+    enemyX_change.append(ran.randint(4,8))
     enemyY_change.append(40)
 
 # bullet
@@ -58,9 +58,16 @@ font = pg.font.Font('assets/Minecrafter.Reg.ttf',32)
 textX = 10
 textY = 10
 
+#game over text
+over_font = pg.font.Font('assets/Minecrafter.Reg.ttf',64)
+
 def show_score(x, y):
     score = font.render("Score : " + str(score_value),True,(255,255,255))
     screen.blit(score,(x, y))
+
+def game_over_text():
+    over_text = over_font.render("GAME OVER",True,(255,255,255))
+    screen.blit(over_text,(250,250))
 
 def player(x, y):
     screen.blit(playerImg, (x, y))
@@ -136,6 +143,12 @@ while running:
 
     # enemy movement
     for i in range(num_of_enemies):
+#(enemyY[i] >= playerY-50 and enemyX[i] >= playerX-50)
+#(enemyY[i] >= playerY-50 and enemyX[i] <= playerX+50)
+        #game over
+        # if  (enemyY[i] >= playerY-50 and enemyX[i] <= playerX+50):
+        #     print('hit')
+
         enemyX[i] += enemyX_change[i]
         if enemyX[i] <= 0:
             enemyX_change[i] = 4
