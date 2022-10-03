@@ -24,28 +24,45 @@ playerX_change = 0
 playerY_change = 0
 
 # enemy
-enemyImg = pg.image.load('assets/alien.png')
-enemyX = ran.randint(0, 735)
-enemyY = 40
-enemyX_change = 4
-enemyY_change = 40
+enemyImg = []
+enemyX = []
+enemyY = []
+enemyX_change = []
+enemyY_change = []
+num_of_enemies = 6
+
+for i in range (num_of_enemies):
+    enemyImg.append(pg.image.load('assets/alien.png'))
+    enemyX.append(ran.randint(0, 735))
+    enemyY.append(ran.randint(0,40))
+    enemyX_change.append(4)
+    enemyY_change.append(40)
 
 # bullet
 bulletImg = pg.image.load('assets/bullet.png')
 bulletX = 0
-bulletY = 480
+bulletY = playerY
 bulletX_change = 0
 bulletY_change = 10
 bullet_state = "ready"
 
-score = 0
+#score
+score_value = 0
+font = pg.font.Font('assets/Minecrafter.Reg.ttf',32)
+
+textX = 10
+textY = 10
+
+def show_score(x, y):
+    score = font.render("Score : " + str(score_value),True,(255,255,255))
+    screen.blit(score,(x, y))
 
 def player(x, y):
     screen.blit(playerImg, (x, y))
 
 
-def enemy(x, y):
-    screen.blit(enemyImg, (x, y))
+def enemy(x, y, i):
+    screen.blit(enemyImg[i], (x, y))
 
 
 def fire_bullet(x, y):
@@ -88,6 +105,7 @@ while running:
             if event.key == pg.K_SPACE:
                 if bullet_state == "ready":
                     bulletX = playerX
+                    bulletY = playerY
                     fire_bullet(bulletX,bulletY)
 
         if event.type == pg.KEYUP:
@@ -110,33 +128,34 @@ while running:
         playerY = 536
 
     # enemy movement
-    enemyX += enemyX_change
-
-    if enemyX <= 0:
-        enemyX_change = 4
-        enemyY += enemyY_change
-    elif enemyX >= 736:
-        enemyX_change = -4
-        enemyY += enemyY_change
+    for i in range(num_of_enemies):
+        enemyX[i] += enemyX_change[i]
+        if enemyX[i] <= 0:
+            enemyX_change[i] = 4
+            enemyY[i] += enemyY_change[i]
+        elif enemyX[i] >= 736:
+            enemyX_change[i] = -4
+            enemyY[i] += enemyY_change[i]
+        
+        #collision
+        collision = isCollision(enemyX[i],enemyY[i],bulletX,bulletY)
+        if collision:
+            bulletY = playerY
+            bullet_state = "ready"
+            score_value += 1
+            enemyX[i] = ran.randint(0, 735)
+            enemyY[i] = 40
+        
+        enemy(enemyX[i], enemyY[i],i)
     
     #bullet movement
     if bulletY <= 0:
-        bulletY = 480
+        bulletY = playerY
         bullet_state = "ready"
     if bullet_state == "fire":
         fire_bullet(bulletX,bulletY)
         bulletY -= bulletY_change
 
-    #collision
-    collision = isCollision(enemyX,enemyY,bulletX,bulletY)
-    if collision:
-        bulletY = 480
-        bullet_state = "ready"
-        score += 1
-        print(score)
-        enemyX = ran.randint(0, 735)
-        enemyY = 40
-
     player(playerX, playerY)
-    enemy(enemyX, enemyY)
+    show_score(textX,textY)
     pg.display.update()
